@@ -7,6 +7,10 @@ O sistema registra os pedidos que chegam ao balcão de uma lavanderia: cada pedi
 tem uma comanda, o cliente e as peças. Ele calcula o preço, o prazo e a data
 prevista de entrega, e controla o andamento do pedido até a retirada.
 
+## Documentação
+
+Documento da prova (Google Docs): https://docs.google.com/document/d/1foTWkLumUu_W5bXr03bRAyRyV7kA7BOD5_EOzqeUbT8/edit?usp=drivesdk
+
 ## Como rodar
 
 ```bash
