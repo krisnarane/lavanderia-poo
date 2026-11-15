@@ -1,0 +1,122 @@
+@startuml
+title Lavanderia API — Diagrama de classes
+skinparam classAttributeIconSize 0
+
+package models {
+  abstract class Peca {
+    # _id : int
+    # _descricao : str
+    # _quantidade : int
+    + TIPO : str
+    + MAX_QUANTIDADE : int = 50
+    + tipo : str
+    + {abstract} preco() : float
+    + {abstract} prazo_dias() : int
+    + {abstract} tabela() : dict
+    + to_dict() : dict
+    + de_dict(dados : dict) : Peca
+  }
+
+  class PecaComum {
+    + PRECO_UNITARIO = 7.00
+    + PRAZO_DIAS = 2
+    + preco() : float
+    + prazo_dias() : int
+  }
+
+  class Edredom {
+    # _tamanho : str
+    + PRECO_POR_TAMANHO : dict
+    + PRAZO_DIAS = 4
+    + MAX_QUANTIDADE = 5
+    + preco() : float
+    + prazo_dias() : int
+  }
+
+  class Delicada {
+    # _tecido : str
+    + PRECO_BASE = 15.00
+    + ACRESCIMO_POR_TECIDO : dict
+    + PRAZO_DIAS = 5
+    + MAX_QUANTIDADE = 10
+    + preco() : float
+    + prazo_dias() : int
+  }
+
+  enum StatusPedido {
+    RECEBIDO
+    LAVANDO
+    PRONTO
+    ENTREGUE
+    + proximo() : StatusPedido
+  }
+
+  class Pedido {
+    # _id : int
+    # _comanda : str
+    # _cliente : str
+    # _telefone : str
+    # _data_entrada : date
+    # _status : StatusPedido
+    # _data_entrega : date
+    # _pecas : list[Peca]
+    + adicionar_peca(peca : Peca) : Peca
+    + remover_peca(peca_id : int)
+    + contem_tipo(tipo : str) : bool
+    + valor_total() : float
+    + prazo_dias() : int
+    + data_prevista_entrega() : date
+    + alterar_status(novo : str)
+    + validar_remocao()
+    + to_dict() : dict
+    + de_dict(dados : dict) : Pedido
+  }
+
+  class ErroNegocio
+  class NaoEncontradoError
+  class ConflitoError
+  class DadoInvalidoError
+}
+
+package data {
+  abstract class Repositorio {
+    + {abstract} listar() : list
+    + {abstract} buscar(id : int)
+    + {abstract} salvar(objeto)
+    + {abstract} remover(id : int) : bool
+  }
+  class RepositorioJson {
+    # _caminho : Path
+    # _de_dict : Callable
+  }
+}
+
+package controllers {
+  class PedidoController {
+    # _repo : Repositorio
+    + listar(status, tipo) : list
+    + buscar(id) : dict
+    + criar(dados) : dict
+    + atualizar(id, dados) : dict
+    + remover(id)
+    + adicionar_peca(id, dados) : dict
+    + remover_peca(id, peca_id)
+    + alterar_status(id, status) : dict
+    + previsao_entrega(id) : dict
+    + tabela_precos() : list
+  }
+}
+
+Peca <|-- PecaComum
+Peca <|-- Edredom
+Peca <|-- Delicada
+Pedido *-- "0..30" Peca : guarda
+Pedido --> StatusPedido
+Exception <|-- ErroNegocio
+ErroNegocio <|-- NaoEncontradoError
+ErroNegocio <|-- ConflitoError
+ErroNegocio <|-- DadoInvalidoError
+Repositorio <|-- RepositorioJson
+PedidoController --> Repositorio
+PedidoController ..> Pedido
+@enduml
